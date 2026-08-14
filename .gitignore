@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dist-ssr/
+
+# vite cache
+*.local
+.vite/
+
+# typescript build info
+*.tsbuildinfo
+
+# logs & os
+*.log
+.DS_Store
+Thumbs.db
+
+# editor
+.idea/
+.vscode/

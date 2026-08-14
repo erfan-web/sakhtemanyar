@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "skills": {
+    "figma-create-new-file": {
+      "source": "figma/mcp-server-guide",
+      "sourceType": "github",
+      "skillPath": "skills/figma-create-new-file/SKILL.md",
+      "computedHash": "501c141d348ac68947430761a187b6f0aaa2ed8b1fab439a3bb9e38b631949ed"
+    },
+    "figma-use": {
+      "source": "figma/mcp-server-guide",
+      "sourceType": "github",
+      "skillPath": "skills/figma-use/SKILL.md",
+      "computedHash": "38fd1ad1e21390279a24d2813ca331003825718033f7ab01c859a69c3adf68ff"
+    },
+    "figma-use-figjam": {
+      "source": "figma/mcp-server-guide",
+      "sourceType": "github",
+      "skillPath": "skills/figma-use-figjam/SKILL.md",
+      "computedHash": "5b15832bf58f5988732d69dd7a8f8f41b7752287f3798394f898b8b8a0cf8bf8"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "f4647ca866a3accf763777f83e7682954f0187cd6bea7eea0399796652414e8f"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "589bc4b17278aaaf13c2ca34f657a9f9a2f35097e4c0e9315b823d96168736f0"
+    }
+  }
+}
