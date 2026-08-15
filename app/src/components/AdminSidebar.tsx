@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 const items = [
   { to: '/admin', end: true, icon: 'bi-grid-1x2', label: 'خانه' },
   { to: '/admin/issue', icon: 'bi-cash-stack', label: 'صدور شارژ' },
+  { to: '/admin/utilities', icon: 'bi-plugin', label: 'قبوض و کنتور' },
   { to: '/admin/units', icon: 'bi-people', label: 'وضعیت واحدها' },
   { to: '/admin/expenses', icon: 'bi-receipt', label: 'هزینه‌ها' },
   { to: '/admin/requests', icon: 'bi-tools', label: 'درخواست‌ها' },

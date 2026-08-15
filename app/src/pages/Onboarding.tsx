@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { toFaDigits } from '../lib/format'
 import type { OnboardingData } from '../types'
 
-const steps = ['نام ساختمان', 'تعداد واحد', 'آدرس', 'شارژ پیش‌فرض', 'ساکنین']
+const steps = ['نام ساختمان', 'تعداد واحد', 'آدرس', 'متراژ هر واحد', 'نفرات هر واحد', 'ساکنین']
 
 export default function Onboarding() {
   const { user } = useAuth()
@@ -14,7 +14,13 @@ export default function Onboarding() {
   const navigate = useNavigate()
 
   const [step, setStep] = useState(0)
-  const [data, setData] = useState<OnboardingData>({ name: '', units: 18, address: '', defaultCharge: 1_200_000 })
+  const [data, setData] = useState<OnboardingData>({
+    name: '',
+    units: 18,
+    address: '',
+    areaM2: 90,
+    occupants: 3,
+  })
   const [error, setError] = useState('')
 
   if (!user) return <Navigate to="/login" replace />
@@ -26,8 +32,12 @@ export default function Onboarding() {
       setError('نام ساختمان را بنویسید (حداقل ۳ حرف).')
       return
     }
-    if (step === 3 && data.defaultCharge < 50_000) {
-      setError('مبلغ شارژ پیش‌فرض را می‌توانید بعداً هم تغییر دهید؛ حداقل ۵۰ هزار تومان.')
+    if (step === 3 && data.areaM2 < 20) {
+      setError('متراژ هر واحد را حداقل ۲۰ متر مربع وارد کنید.')
+      return
+    }
+    if (step === 4 && data.occupants < 1) {
+      setError('تعداد نفرات هر واحد حداقل ۱ نفر است.')
       return
     }
     setError('')
@@ -40,7 +50,7 @@ export default function Onboarding() {
   }
 
   const icon = (i: number) => {
-    const icons = ['bi-building', 'bi-door-open', 'bi-geo-alt', 'bi-cash-coin', 'bi-people']
+    const icons = ['bi-building', 'bi-door-open', 'bi-geo-alt', 'bi-rulers', 'bi-people-fill', 'bi-people']
     return icons[i]
   }
 
@@ -142,23 +152,56 @@ export default function Onboarding() {
 
           {step === 3 && (
             <Form.Group>
-              <Form.Label>شارژ پیش‌فرض ماهانه (تومان)</Form.Label>
+              <Form.Label>متراژ هر واحد (متر مربع)</Form.Label>
               <Form.Control
                 size="lg"
                 inputMode="numeric"
                 className="fs-4 fw-bold"
-                name="defaultCharge"
+                name="areaM2"
                 autoComplete="off"
-                value={String(data.defaultCharge)}
+                value={String(data.areaM2)}
                 onChange={(e) =>
-                  update({ defaultCharge: Number(e.target.value.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))) })
+                  update({ areaM2: Number(e.target.value.replace(/[۰-۹]/g, (d) => String('۰۱۲۳۴۵۶۷۸۹'.indexOf(d)))) })
                 }
               />
-              <Form.Text className="text-muted-bm">قابل ویرایش در هر ماه از «صدور شارژ».</Form.Text>
+              <Form.Text className="text-muted-bm">
+                سهم هر واحد از شارژ بر اساس متراژ محاسبه می‌شود (قانون تملک آپارتمان‌ها). می‌توانید بعداً برای هر
+                واحد مقدار جداگانه تنظیم کنید.
+              </Form.Text>
             </Form.Group>
           )}
 
           {step === 4 && (
+            <Form.Group>
+              <Form.Label>تعداد نفرات هر واحد</Form.Label>
+              <div className="d-flex align-items-center gap-3">
+                <Button
+                  variant="outline-primary"
+                  size="lg"
+                  style={{ width: 56 }}
+                  onClick={() => update({ occupants: Math.max(1, data.occupants - 1) })}
+                  aria-label="کاهش نفرات"
+                >
+                  <i aria-hidden="true" className="bi bi-dash-lg" />
+                </Button>
+                <div className="fs-2 fw-bold flex-grow-1 text-center">{toFaDigits(data.occupants)}</div>
+                <Button
+                  variant="outline-primary"
+                  size="lg"
+                  style={{ width: 56 }}
+                  onClick={() => update({ occupants: Math.min(10, data.occupants + 1) })}
+                  aria-label="افزایش نفرات"
+                >
+                  <i aria-hidden="true" className="bi bi-plus-lg" />
+                </Button>
+              </div>
+              <Form.Text className="text-muted-bm">
+                در صورت انتخاب «سهم بر اساس نفرات» در صدور شارژ، مبنای تقسیم نفرات خواهد بود.
+              </Form.Text>
+            </Form.Group>
+          )}
+
+          {step === 5 && (
             <Form.Group>
               <Form.Label>دعوت ساکنین</Form.Label>
               <div className="bm-card p-3 bg-soft-primary mb-2">

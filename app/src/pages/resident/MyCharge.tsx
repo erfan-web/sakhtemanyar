@@ -4,6 +4,9 @@ import { useAuth } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
 import { formatToman, toFaDigits } from '../../lib/format'
 import { ChargeStatusPill } from '../../components/StatusPills'
+import type { Utility } from '../../types'
+
+const UTILITY_LABELS: Record<Utility, string> = { water: 'آب', electricity: 'برق', gas: 'گاز' }
 
 export default function MyCharge() {
   const { user } = useAuth()
@@ -15,6 +18,13 @@ export default function MyCharge() {
   const [error, setError] = useState('')
 
   if (!unit) return null
+
+  const sharedUtilities = (Object.keys(building.utilityConfig) as Utility[]).filter(
+    (u) => building.utilityConfig[u] === 'shared',
+  )
+  const separateUtilities = (Object.keys(building.utilityConfig) as Utility[]).filter(
+    (u) => building.utilityConfig[u] === 'separate',
+  )
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -42,14 +52,36 @@ export default function MyCharge() {
           <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div>
               <div className="text-muted-bm" style={{ fontSize: '0.85rem' }}>
-                شارژ {building.month} — واحد {unit.num}
+                شارژ {building.month} — واحد {toFaDigits(unit.num)}
               </div>
-              <div className="fs-2 fw-bold mt-1">{formatToman(unit.chargeAmount ?? building.defaultCharge)}</div>
+              <div className="fs-2 fw-bold mt-1">{formatToman(unit.chargeAmount ?? 0)}</div>
               <div className="text-muted-bm" style={{ fontSize: '0.8rem' }}>
-                مهلت پرداخت: پایان {building.month} · شارژ پیش‌فرض ساختمان {formatToman(building.defaultCharge)}
+                {toFaDigits(unit.areaM2)} متر مربع · {toFaDigits(unit.occupants)} نفر
               </div>
             </div>
             <ChargeStatusPill status={unit.chargeStatus} />
+          </div>
+        </Card.Body>
+      </Card>
+
+      <Card className="bm-card mb-3">
+        <Card.Header className="bg-transparent fw-bold">اجزای شارژ این ماه</Card.Header>
+        <Card.Body className="p-0">
+          <div className="d-flex justify-content-between px-3 py-2 border-top">
+            <span className="text-muted-bm">سهم بر اساس {building.divisionMethod === 'area' ? 'متراژ' : building.divisionMethod === 'persons' ? 'نفرات' : 'تساوی'}</span>
+            <span>{formatToman(unit.chargeAmount ?? 0)}</span>
+          </div>
+          <div className="d-flex justify-content-between px-3 py-2 border-top">
+            <span className="text-muted-bm">قبوض مشترک ({sharedUtilities.map((u) => UTILITY_LABELS[u]).join('، ') || '—'})</span>
+            <span className="text-muted-bm">در همین سهم لحاظ شده</span>
+          </div>
+          <div className="d-flex justify-content-between px-3 py-2 border-top">
+            <span className="text-muted-bm">قبوض مستقل ({separateUtilities.map((u) => UTILITY_LABELS[u]).join('، ') || '—'})</span>
+            <span className="text-muted-bm">مستقیماً به اداره می‌پردازید</span>
+          </div>
+          <div className="d-flex justify-content-between px-3 py-2 border-top">
+            <span className="text-muted-bm">مهلت پرداخت</span>
+            <span className="text-muted-bm">پایان {building.month}</span>
           </div>
         </Card.Body>
       </Card>
@@ -97,8 +129,7 @@ export default function MyCharge() {
                 {toFaDigits('6104-3372-1260-9012')}
               </div>
               <div className="text-muted-bm" style={{ fontSize: '0.85rem' }}>
-                مبلغ دقیق <strong>{formatToman(unit.chargeAmount ?? building.defaultCharge)}</strong> را واریز کنید؛ سپس
-                شماره پیگیری را این‌جا ثبت کنید تا مدیر آن را تأیید کند.
+                مبلغ دقیق <strong>{formatToman(unit.chargeAmount ?? 0)}</strong> را واریز کنید؛ سپس شما شماره پیگیری را این‌جا ثبت کنید تا مدیر آن را تأیید کند.
               </div>
             </Card.Body>
           </Card>

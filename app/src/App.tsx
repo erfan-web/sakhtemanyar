@@ -18,6 +18,7 @@ import AdminRequests from './pages/admin/AdminRequests'
 import RequestDetail from './pages/admin/RequestDetail'
 import NewAnnouncement from './pages/admin/NewAnnouncement'
 import BuildingAdmin from './pages/admin/BuildingAdmin'
+import Utilities from './pages/admin/Utilities'
 
 function HomeRedirect() {
   const { user } = useAuth()
@@ -49,6 +50,7 @@ export default function App() {
           <Route path="requests" element={<AdminRequests />} />
           <Route path="requests/:id" element={<RequestDetail />} />
           <Route path="announce" element={<NewAnnouncement />} />
+          <Route path="utilities" element={<Utilities />} />
           <Route path="building" element={<BuildingAdmin />} />
         </Route>
 

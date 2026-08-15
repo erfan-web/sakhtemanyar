@@ -35,7 +35,7 @@ export default function ResidentHome() {
                 <div className="opacity-75" style={{ fontSize: '0.8rem' }}>
                   شارژ {building.month}
                 </div>
-                <div className="fs-2 fw-bold mt-1">{formatToman(unit.chargeAmount ?? building.defaultCharge)}</div>
+                <div className="fs-2 fw-bold mt-1">{formatToman(unit.chargeAmount ?? 0)}</div>
                 <div className="opacity-75" style={{ fontSize: '0.8rem' }}>
                   مهلت پرداخت: پایان {building.month}
                 </div>
@@ -66,7 +66,7 @@ export default function ResidentHome() {
                   شارژ من
                 </div>
                 <div className="stat-value">
-                  {formatShortToman(unit.chargeAmount ?? building.defaultCharge)}
+                  {formatShortToman(unit.chargeAmount ?? 0)}
                 </div>
               </div>
             </Card.Body>

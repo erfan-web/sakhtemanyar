@@ -78,8 +78,10 @@ export default function Units() {
                 <div className="text-muted-bm mb-1" style={{ fontSize: '0.85rem' }}>
                   {u.residentName}
                   {u.isOwner ? ' · مالک' : ' · مستأجر'}
+                  {' · '}
+                  {toFaDigits(u.areaM2)} متر
                 </div>
-                <div className="fw-bold mb-2">{formatToman(u.chargeAmount ?? building.defaultCharge)}</div>
+                <div className="fw-bold mb-2">{formatToman(u.chargeAmount ?? 0)}</div>
 
                 {u.chargeStatus === 'awaiting' && u.receipt && (
                   <div className="status-amber rounded-3 p-3 mb-2">

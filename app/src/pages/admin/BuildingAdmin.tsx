@@ -1,10 +1,19 @@
 import { Button, Card } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import { useApp } from '../../context/AppContext'
-import { formatToman, toFaDigits } from '../../lib/format'
+import { toFaDigits } from '../../lib/format'
 import { ChargeStatusPill } from '../../components/StatusPills'
+import type { Utility } from '../../types'
+
+const UTILITY_LABELS: Record<Utility, string> = { water: 'آب', electricity: 'برق', gas: 'گاز' }
 
 export default function BuildingAdmin() {
   const { building, units, resetDemo } = useApp()
+
+  const sharedSummary = (Object.keys(building.utilityConfig) as Utility[])
+    .filter((u) => building.utilityConfig[u] === 'shared')
+    .map((u) => UTILITY_LABELS[u])
+    .join('، ')
 
   return (
     <div>
@@ -26,8 +35,16 @@ export default function BuildingAdmin() {
                 ماه جاری: {building.month}
               </div>
               <div className="text-muted-bm" style={{ fontSize: '0.85rem' }}>
-                شارژ پیش‌فرض: {formatToman(building.defaultCharge)}
+                روش تقسیم شارژ:{' '}
+                {building.divisionMethod === 'area' ? 'متراژ' : building.divisionMethod === 'persons' ? 'نفرات' : 'تساوی'}
               </div>
+              <div className="text-muted-bm" style={{ fontSize: '0.85rem' }}>
+                قبوض مشترک در شارژ: {sharedSummary || '—'}
+              </div>
+              <Link to="/admin/utilities" className="btn btn-outline-primary btn-sm mt-2">
+                <i aria-hidden="true" className="bi bi-plugin ms-1" />
+                تنظیم قبوض و کنتور
+              </Link>
             </Card.Body>
           </Card>
         </div>

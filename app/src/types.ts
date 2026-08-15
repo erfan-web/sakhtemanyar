@@ -6,6 +6,14 @@ export type ChargeStatus = 'issued' | 'paid' | 'awaiting' | 'debt'
 
 export type RequestStatus = 'open' | 'in_progress' | 'done'
 
+export type Utility = 'water' | 'electricity' | 'gas'
+
+export type MeterMode = 'shared' | 'separate'
+
+export type DivisionMethod = 'area' | 'persons' | 'equal'
+
+export const UTILITIES: Utility[] = ['water', 'electricity', 'gas']
+
 export interface User {
   name: string
   role: Role
@@ -19,6 +27,8 @@ export interface Unit {
   residentName: string
   phone: string
   isOwner: boolean
+  areaM2: number
+  occupants: number
   chargeAmount: number | null
   chargeStatus: ChargeStatus
   receipt?: {
@@ -62,13 +72,23 @@ export interface Announcement {
 export interface Building {
   name: string
   address: string
-  defaultCharge: number
   month: string
+  divisionMethod: DivisionMethod
+  utilityConfig: Record<Utility, MeterMode>
+}
+
+export interface ChargeIssue {
+  method: DivisionMethod
+  budget: number
+  issuedAt: string
+  month: string
+  items: { unitId: number; amount: number }[]
 }
 
 export interface OnboardingData {
   name: string
   units: number
   address: string
-  defaultCharge: number
+  areaM2: number
+  occupants: number
 }

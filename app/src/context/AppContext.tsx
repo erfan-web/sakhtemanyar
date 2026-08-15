@@ -4,12 +4,16 @@ import type {
   Announcement,
   Building,
   ChargeStatus,
+  DivisionMethod,
   Expense,
+  MeterMode,
   OnboardingData,
   RepairRequest,
   Unit,
+  Utility,
 } from '../types'
 import { BUILDING, INITIAL_ANNOUNCEMENTS, INITIAL_EXPENSES, INITIAL_REQUESTS, makeUnits } from '../data/mockData'
+import { computeShares } from '../lib/charge'
 
 interface Toast {
   id: number
@@ -25,7 +29,9 @@ interface AppContextValue {
   announcements: Announcement[]
   toasts: Toast[]
   pushToast: (message: string, kind?: Toast['kind']) => void
-  issueMonthlyCharge: (amount: number) => void
+  issueMonthlyCharge: (budget: number) => void
+  updateUtilityConfig: (utility: Utility, mode: MeterMode) => void
+  setDivisionMethod: (method: DivisionMethod) => void
   approveReceipt: (unitId: number) => void
   rejectReceipt: (unitId: number) => void
   payCharge: (unitId: number, receipt: { trackingCode: string; note?: string }) => void
@@ -47,7 +53,7 @@ interface PersistedState {
   announcements: Announcement[]
 }
 
-const STORAGE_KEY = 'bm-state-v1'
+const STORAGE_KEY = 'bm-state-v2'
 
 function seedState(): PersistedState {
   return {
@@ -106,17 +112,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
       announcements,
       toasts,
       pushToast,
-      issueMonthlyCharge: (amount) => {
+      issueMonthlyCharge: (budget) => {
+        const method = building.divisionMethod
+        const items = computeShares(units, budget, method)
+        const byId = new Map(items.map((i) => [i.unitId, i.amount]))
         setUnits((prev) =>
           prev.map((u) => ({
             ...u,
-            chargeAmount: amount,
+            chargeAmount: byId.get(u.id) ?? 0,
             chargeStatus: 'issued' as ChargeStatus,
             receipt: undefined,
           })),
         )
-        setBuilding((prev) => ({ ...prev, defaultCharge: amount }))
         pushToast(`شارژ ماهانه برای ${units.length} واحد صادر و پیامک شد`, 'success')
+      },
+      updateUtilityConfig: (utility, mode) => {
+        setBuilding((prev) => ({
+          ...prev,
+          utilityConfig: { ...prev.utilityConfig, [utility]: mode },
+        }))
+        pushToast('نحوهٔ کنتور به‌روزرسانی شد', 'success')
+      },
+      setDivisionMethod: (method) => {
+        setBuilding((prev) => ({ ...prev, divisionMethod: method }))
+        pushToast('روش تقسیم شارژ به‌روزرسانی شد', 'success')
       },
       approveReceipt: (unitId) => {
         setUnits((prev) => prev.map((u) => (u.id === unitId ? { ...u, chargeStatus: 'paid' } : u)))
@@ -170,14 +189,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
           residentName: 'ساکن',
           phone: '',
           isOwner: false,
+          areaM2: data.areaM2,
+          occupants: data.occupants,
           chargeAmount: null,
           chargeStatus: 'issued',
         }))
         setBuilding({
           name: data.name,
           address: data.address,
-          defaultCharge: data.defaultCharge,
           month: 'مرداد ۱۴۰۵',
+          divisionMethod: 'area',
+          utilityConfig: {
+            water: 'shared',
+            electricity: 'separate',
+            gas: 'separate',
+          },
         })
         setUnits(newUnits)
         setExpenses([])

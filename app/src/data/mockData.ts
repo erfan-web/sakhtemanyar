@@ -3,8 +3,13 @@ import type { Announcement, Building, Expense, RepairRequest, Unit } from '../ty
 export const BUILDING: Building = {
   name: 'مجتمع مهرشهر',
   address: 'کرج، مهرشهر، بلوار کاج',
-  defaultCharge: 1_200_000,
   month: 'مرداد ۱۴۰۵',
+  divisionMethod: 'area',
+  utilityConfig: {
+    water: 'shared',
+    electricity: 'separate',
+    gas: 'separate',
+  },
 }
 
 const names: { name: string; isOwner: boolean; paid: boolean; debt: boolean }[] = [
@@ -32,8 +37,17 @@ function phoneFor(num: number): string {
   return `0912000${String(100 + num).slice(-4)}`
 }
 
+const areas = [68, 72, 80, 85, 92, 98, 104, 110, 118, 125, 132, 140, 148, 155, 162, 170, 178, 185]
+
+function areaFor(num: number): number {
+  return areas[(num - 1) % areas.length]
+}
+
+function occupantsFor(num: number): number {
+  return (num % 3) + 1
+}
+
 export function makeUnits(): Unit[] {
-  const base = BUILDING.defaultCharge
   return names.map((n, i) => {
     const num = i + 1
     const unit: Unit = {
@@ -42,7 +56,9 @@ export function makeUnits(): Unit[] {
       residentName: n.name,
       phone: phoneFor(num),
       isOwner: n.isOwner,
-      chargeAmount: base,
+      areaM2: areaFor(num),
+      occupants: occupantsFor(num),
+      chargeAmount: null,
       chargeStatus: n.paid ? 'paid' : n.debt ? 'debt' : 'awaiting',
     }
     if (unit.chargeStatus === 'awaiting') {

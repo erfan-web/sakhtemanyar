@@ -11,7 +11,7 @@ export default function AdminHome() {
   const navigate = useNavigate()
 
   const paidUnits = units.filter((u) => u.chargeStatus === 'paid')
-  const collected = paidUnits.reduce((sum, u) => sum + (u.chargeAmount ?? building.defaultCharge), 0)
+  const collected = paidUnits.reduce((sum, u) => sum + (u.chargeAmount ?? 0), 0)
   const debtors = units.filter((u) => u.chargeStatus === 'debt').length
   const openRequests = requests.filter((r) => r.status !== 'done')
   const monthExpenses = expenses.reduce((s, e) => s + e.amount, 0)
